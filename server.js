@@ -32,11 +32,14 @@ app.use(express.urlencoded({
 }));
 app.use(express.json());
 
+app.use('/api', adsRoutes);
+app.use('/api', usersRoutes);
+
 app.use((req, res) => {
     res.status(404).send('404 not found...');
 });
-// app.use(express.static(path.join(__dirname, '/client/build')));
+app.use(express.static(path.join(__dirname, '/client/build')));
 
-// app.get('*', (req, res) => {
-//     res.sendFile(path.join(__dirname, '/client/build/index.html'));
-//   });
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '/client/build/index.html'));
+});
