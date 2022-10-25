@@ -25,7 +25,7 @@ exports.getOne = async (req, res) => {
     }
 };
 
-exports.post = async (req, res) => {
+exports.add = async (req, res) => {
     try {
         const {
             title,
@@ -59,17 +59,23 @@ exports.post = async (req, res) => {
 exports.delete = async (req, res) => {
 
     try {
-        const elm = await Ad.findById(req.params.id);
-        if (elm) {
-            await Ad.deleteOne({
-                _id: req.params.id
+        const elm = await Ad.findById(req.params.id).populate('user');
+        if (elm.user.login === req.session.login) {
+            if (elm) {
+                await Ad.deleteOne({
+                    _id: req.params.id
+                });
+                res.json({
+                    message: 'OK'
+                })
+            } else res.status(404).json({
+                message: 'Not found...'
             });
-            res.json({
-                message: 'OK'
-            })
-        } else res.status(404).json({
-            message: 'Not found...'
-        });
+        } else {
+            res.status(401).send({
+                message: 'Unauthorized'
+            });
+        }
     } catch (err) {
         res.status(500).json({
             message: err
@@ -87,26 +93,32 @@ exports.update = async (req, res) => {
         place
     } = req.body;
     try {
-        const elm = await Ad.findById(req.params.id);
-        if (elm) {
-            await Ad.updateOne({
-                _id: req.params.id
-            }, {
-                $set: {
-                    title: title,
-                    content: content,
-                    date: date,
-                    price: price,
-                    image: image,
-                    place: place
-                }
-            });
-            res.json({
-                message: 'OK'
+        const elm = await Ad.findById(req.params.id).populate('user');
+        if (elm.user.login === req.session.login) {
+            if (elm) {
+                await Ad.updateOne({
+                    _id: req.params.id
+                }, {
+                    $set: {
+                        title: title,
+                        content: content,
+                        date: date,
+                        price: price,
+                        image: image,
+                        place: place
+                    }
+                });
+                res.json({
+                    message: 'OK'
+                })
+            } else res.status(404).json({
+                message: 'Not found...'
             })
-        } else res.status(404).json({
-            message: 'Not found...'
-        });
+        } else {
+            res.status(401).send({
+                message: 'Unauthorized'
+            });
+        }
     } catch (err) {
         res.status(500).json({
             message: err
@@ -130,4 +142,5 @@ exports.search = async (req, res) => {
             message: err
         });
     }
+
 }

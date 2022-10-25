@@ -14,7 +14,7 @@ const adSchema = new mongoose.Schema({
         maxlength: 1000
     },
     date: {
-        type: Date,
+        type: String,
         required: true
     },
     price: {
