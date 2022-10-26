@@ -1,5 +1,5 @@
 const Ad = require('../models/ad.model');
-const router = require('../routes/ads.routes');
+const getImageFileType = require('../utils/getImageFileType');
 
 exports.getAll = async (req, res) => {
     try {
@@ -32,23 +32,29 @@ exports.add = async (req, res) => {
             content,
             date,
             price,
-            image,
             place,
             user
         } = req.body;
-        const newAd = new Ad({
-            title: title,
-            content: content,
-            date: date,
-            price: price,
-            image: image,
-            place: place,
-            user: user
-        });
-        await newAd.save();
-        res.json({
-            message: 'OK'
-        });
+        const fileType = req.file ? await getImageFileType(req.file) : 'unknown';
+        if (req.file && ['image/png', 'image/jpeg', 'image/gif'].includes(fileType)) {
+            const newAd = new Ad({
+                title: title,
+                content: content,
+                date: date,
+                price: price,
+                image: req.file.filename,
+                place: place,
+                user: user
+            });
+            await newAd.save();
+            res.json({
+                message: 'OK'
+            });
+        } else {
+            res.status(400).json({
+                message: 'bad request'
+            });
+        }
     } catch (err) {
         res.status(500).json({
             message: err
@@ -89,13 +95,12 @@ exports.update = async (req, res) => {
         content,
         date,
         price,
-        image,
         place
     } = req.body;
     try {
         const elm = await Ad.findById(req.params.id).populate('user');
-        if (elm.user.login === req.session.login) {
-            if (elm) {
+        if (elm) {
+            if (elm.user.login === req.session.login) {
                 await Ad.updateOne({
                     _id: req.params.id
                 }, {
@@ -104,7 +109,7 @@ exports.update = async (req, res) => {
                         content: content,
                         date: date,
                         price: price,
-                        image: image,
+                        image: req.file.filename,
                         place: place
                     }
                 });

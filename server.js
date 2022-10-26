@@ -10,7 +10,14 @@ const authRoutes = require('./routes/auth.routes');
 
 const app = express();
 
-app.use(cors());
+if (process.env.NODE_ENV !== 'production') {
+    app.use(
+        cors({
+            origin: ['http://localhost:3000'],
+            credentials: true,
+        })
+    );
+}
 
 const server = app.listen(process.env.PORT || 8000, () => {
     console.log('Server is running on port: 8000')
@@ -34,27 +41,35 @@ db.once('open', () => {
 });
 db.on('error', err => console.log('Error ' + err));
 
+app.use(express.json());
+app.use(express.urlencoded({
+    extended: false
+}));
+
 app.use(session({
     secret: 'xyz567',
     store: MongoStore.create(db),
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV == 'production',
+    },
 }));
 
 
-app.use(express.urlencoded({
-    extended: true
-}));
-app.use(express.json());
+
+app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.static(path.join(__dirname, '/client/build')));
 
 app.use('/api', adsRoutes);
 app.use('/api/auth', authRoutes);
 
-app.use((req, res) => {
-    res.status(404).send('404 not found...');
-});
-app.use(express.static(path.join(__dirname, '/client/build')));
+
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '/client/build/index.html'));
+});
+
+app.use((req, res) => {
+    res.status(404).send('404 not found...');
 });
