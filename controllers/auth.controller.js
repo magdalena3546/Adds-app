@@ -1,23 +1,22 @@
 const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const getImageFileType = require('../utils/getImageFileType');
+const fs = require('fs');
 
 exports.register = async (req, res) => {
-    const {
-        login,
-        password,
-        phone
-    } = req.body;
-
-    const fileType = req.file ? await getImageFileType(req.file) : 'unknown';
     try {
-
-        if (req.file && ['image/png', 'image/jpeg', 'image/gif'].includes(fileType)) {
-
+        const {
+            login,
+            password,
+            phone
+        } = req.body;
+        const fileType = req.file ? await getImageFileType(req.file) : 'unknown';
+        if (login && typeof login === 'string' && password && typeof password === 'string' && phone && typeof phone === 'string' && req.file && ['image/png', 'image/jpeg', 'image/gif'].includes(fileType)) {
             const userWithLogin = await User.findOne({
                 login
             });
             if (userWithLogin) {
+                fs.unlinkSync(req.file.path);
                 return res.status(409).send({
                     message: 'User with this login already exists'
                 });
@@ -33,11 +32,13 @@ exports.register = async (req, res) => {
                 message: 'User created ' + user.login
             });
         } else {
+            fs.unlinkSync(req.file.path);
             res.status(400).send({
                 message: 'bad request'
             });
         }
     } catch (err) {
+        fs.unlinkSync(req.file.path);
         res.status(500).send({
             message: err.message
         });
@@ -62,9 +63,9 @@ exports.login = async (req, res) => {
                 });
             } else {
                 if (bcrypt.compareSync(password, user.password)) {
-                    req.session.login = user.login;
-                    res.status(200).send({
-                        message: req.session
+                    req.session.login = user.login
+                    return res.status(200).send({
+                        message: 'Hello ' + req.session.login
                     });
                 } else {
                     res.status(400).send({
@@ -86,7 +87,7 @@ exports.login = async (req, res) => {
 
 exports.getUser = async (req, res) => {
     res.send({
-        message: req.session.login
+        message: "You are logged!"
     })
 };
 

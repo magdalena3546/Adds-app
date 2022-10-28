@@ -4,7 +4,6 @@ const path = require('path');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-
 const adsRoutes = require('./routes/ads.routes');
 const authRoutes = require('./routes/auth.routes');
 
@@ -57,18 +56,16 @@ app.use(session({
 }));
 
 
-
-app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.static(path.join(__dirname, '/client/build')));
+app.use(express.static(path.join(__dirname, '/public')));
 
 app.use('/api', adsRoutes);
 app.use('/api/auth', authRoutes);
 
 
-
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '/client/build/index.html'));
-});
+// app.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname, '/client/build/index.html'));
+// });
 
 app.use((req, res) => {
     res.status(404).send('404 not found...');
