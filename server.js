@@ -23,12 +23,12 @@ const server = app.listen(process.env.PORT || 8000, () => {
 })
 
 const NODE_ENV = process.env.NODE_ENV;
-let dbUri = '';
+// let dbUri = '';
 
-if (NODE_ENV === 'production') dbUri = 'url to remote db';
-else dbUri = 'mongodb://localhost:27017/AdsDB';
+// if (NODE_ENV === 'production') dbUri = 'url to remote db';
+// else dbUri = 'mongodb://localhost:27017/AdsDB';
 
-mongoose.connect(dbUri, {
+mongoose.connect(`mongodb+srv://${process.env.LOGIN}:${process.env.PASSWORD}@cluster0.sixmoim.mongodb.net/?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
