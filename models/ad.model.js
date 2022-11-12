@@ -31,7 +31,7 @@ const adSchema = new mongoose.Schema({
     },
     user: {
         type: String,
-        required: true,
+        required: false,
         ref: 'User'
     }
 });

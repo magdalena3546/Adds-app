@@ -35,6 +35,7 @@ exports.add = async (req, res) => {
             date,
             price,
             place,
+
         } = req.body;
         const user = await User.findOne({
             login: req.session.login
@@ -43,13 +44,13 @@ exports.add = async (req, res) => {
         if (title && typeof title === 'string' && content && typeof content === 'string' && date && typeof date === 'string' && price && place && typeof place === 'string' && user && (title.length >= 10 && title.length <= 50) && (content.length >= 20 && content.length <= 1000)) {
             if (req.file && ['image/png', 'image/jpeg', 'image/gif'].includes(fileType)) {
                 const newAd = new Ad({
-                    title: title,
-                    content: content,
-                    date: date,
-                    price: price,
+                    title,
+                    content,
+                    date,
+                    price,
                     image: req.file.filename,
-                    place: place,
-                    user: user._id
+                    place,
+                    user: user._id,
                 });
                 await newAd.save();
                 res.json({

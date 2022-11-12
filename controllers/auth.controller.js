@@ -32,13 +32,11 @@ exports.register = async (req, res) => {
                 message: 'User created ' + user.login
             });
         } else {
-            fs.unlinkSync(req.file.path);
             res.status(400).send({
                 message: 'bad request'
             });
         }
     } catch (err) {
-        fs.unlinkSync(req.file.path);
         res.status(500).send({
             message: err.message
         });
@@ -49,9 +47,7 @@ exports.login = async (req, res) => {
     try {
         const {
             login,
-            password,
-            avatar,
-            phone
+            password
         } = req.body;
         if (login && typeof login === 'string' && password && typeof password === 'string') {
             const user = await User.findOne({

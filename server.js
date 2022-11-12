@@ -6,13 +6,13 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const adsRoutes = require('./routes/ads.routes');
 const authRoutes = require('./routes/auth.routes');
-
+require('dotenv').config();
 const app = express();
 
 if (process.env.NODE_ENV !== 'production') {
     app.use(
         cors({
-            origin: ['http://localhost:3000'],
+            origin: ['http://localhost:3000', 'http://localhost:8000'],
             credentials: true,
         })
     );
@@ -46,10 +46,10 @@ app.use(express.urlencoded({
 }));
 
 app.use(session({
-    secret: 'xyz567',
+    secret: process.env.SECRET,
     store: MongoStore.create(db),
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
         secure: process.env.NODE_ENV == 'production',
     },
@@ -58,14 +58,16 @@ app.use(session({
 
 app.use(express.static(path.join(__dirname, '/client/build')));
 app.use(express.static(path.join(__dirname, '/public')));
+//
+app.use(express.static(path.join(__dirname, '/uploads/')));
 
 app.use('/api', adsRoutes);
 app.use('/api/auth', authRoutes);
 
 
-// app.get('*', (req, res) => {
-//     res.sendFile(path.join(__dirname, '/client/build/index.html'));
-// });
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '/client/build/index.html'));
+});
 
 app.use((req, res) => {
     res.status(404).send('404 not found...');
