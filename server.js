@@ -49,10 +49,10 @@ app.use(session({
     secret: process.env.SECRET,
     store: MongoStore.create(db),
     resave: false,
-    saveUninitialized: true,
-    cookie: {
-        secure: process.env.NODE_ENV == 'production',
-    },
+    saveUninitialized: false,
+    // cookie: {
+    //     secure: process.env.NODE_ENV == 'production',
+    // },
 }));
 
 
