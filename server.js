@@ -12,7 +12,7 @@ const app = express();
 if (process.env.NODE_ENV !== 'production') {
     app.use(
         cors({
-            origin: ['http://localhost:3000', 'http://localhost:8000'],
+            origin: '*',
             credentials: true,
         })
     );
