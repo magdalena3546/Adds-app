@@ -28,7 +28,7 @@ const NODE_ENV = process.env.NODE_ENV;
 // if (NODE_ENV === 'production') dbUri = 'url to remote db';
 // else dbUri = 'mongodb://localhost:27017/AdsDB';
 
-mongoose.connect(`mongodb+srv://${process.env.LOGIN}:${process.env.PASSWORD}@cluster0.sixmoim.mongodb.net/?retryWrites=true&w=majority`, {
+mongoose.connect(`mongodb+srv://${process.env.LOGIN}:${process.env.PASSWORD}@cluster0.sixmoim.mongodb.net/AdsDB?retryWrites=true&w=majority`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
